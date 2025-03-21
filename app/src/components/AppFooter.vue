@@ -65,11 +65,13 @@
                     </p>
 
                 </div>
-                <div class=" md:basis-1/3 md:h-[250px] ">
+                <div class=" md:basis-1/3 md:h-[250px]  ">
                     <p class="font-semibold text-white text-[20px] leading-[28px] mb-7">Assine nossa<br> newsletter</p>
-                    <IconField>
-                        <InputText placeholder="Escreva seu e-mail" class="opacity-40 w-[255px]" />
-                        <InputIcon class="pi pi-send" />
+                    <IconField class="border border-[white] opacity-40 px-3 rounded-[8px] bg-[white] flex items-center">
+                        <div class="flex items-center ">
+                            <InputText placeholder="Escreva seu e-mail" class="bg-[white] h-[40px]  w-[255px] " />
+                            <div class=" pi pi-send opacity-40 " />
+                        </div> 
                     </IconField>
                 </div>
             </div>
