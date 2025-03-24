@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EntreMães - Home</title>
+</head>
+<body>
+    <h1>Bem-vinda ao EntreMães!</h1>
+    <p>Conecte-se, ajude e receba ajuda.</p>
+
+    {% if user.is_authenticated %}
+        <p>Olá, {{ user.username }}! <a href="{% url 'logout' %}">Sair</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Entrar</a> | <a href="{% url 'register' %}">Cadastre-se</a></p>
+    {% endif %}
+</body>
+</html>

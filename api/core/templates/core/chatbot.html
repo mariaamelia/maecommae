@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - EntreMães</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chatbox { width: 400px; height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: scroll; }
+        input { width: 300px; padding: 5px; }
+        button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Chatbot do EntreMães</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userMessage" placeholder="Digite sua pergunta..." />
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script>
+        function sendMessage() {
+            let userMessage = document.getElementById("userMessage").value;
+            let chatbox = document.getElementById("chatbox");
+
+            chatbox.innerHTML += `<p><strong>Você:</strong> ${userMessage}</p>`;
+
+            fetch("/chatbot/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+                chatbox.scrollTop = chatbox.scrollHeight;
+            })
+            .catch(error => {
+                chatbox.innerHTML += `<p><strong>Erro:</strong> ${error}</p>`;
+            });
+
+            document.getElementById("userMessage").value = "";
+        }
+    </script>
+
+</body>
+</html>
