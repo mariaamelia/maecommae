@@ -16,7 +16,7 @@
             Camila, 28 anos <br> Sete Lagoas, MG </p>
       </div>         
       <div class="card basis-1/3 bg-[#F5F7FA] drop-shadow-xl  p-5 rounded-[8px] ">
-        <p class="text-[#717171] font-Inter font-semibold text-[20px] leading-[28px] text-center">
+        <p class="text-[#717171] font-Inter font-semibold text-[20px] leading-[33px] text-center">
             "Sempre quis voltar a estudar, mas não tinha com quem deixar meus dois filhos pequenos. No MãeComMãe , encontrei outras mães que se revezam nos cuidados das crianças, e agora consigo assistir às aulas. Além disso, descobri novas amigas que entendem os desafios da maternidade!"
         </p>
         <p class="mt-5 ml-5 text-[#E67E80] font-Inter font-semibold text-[20px] leading-[28px] text-center">
