@@ -8,14 +8,12 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-
-
-import json
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from .faqs import buscar_resposta_faq
 
 def register(request):
     if request.method == 'POST':
@@ -100,32 +98,31 @@ API_KEY = os.getenv("OPENROUTER_API_KEY")  # Pegamos a chave da API nas variáve
 def chatbot(request):
     if request.method == "POST":
         try:
+            # Recebe dados JSON
             data = json.loads(request.body)
-            user_message = data.get("message", "")
-
-            if not user_message:
-                return JsonResponse({"error": "Mensagem vazia"}, status=400)
-
-            # Enviando a requisição para a API do OpenRouter (GPT gratuito)
-            response = requests.post(
-                API_URL,
-                headers={
-                    "Authorization": f"Bearer {API_KEY}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "openai/gpt-3.5-turbo",
-                    "messages": [{"role": "user", "content": user_message}]
-                }
-            )
-
-            # Convertendo resposta para JSON
-            ai_response = response.json()
-            bot_reply = ai_response["choices"][0]["message"]["content"]
-
-            return JsonResponse({"response": bot_reply})
-
+            pergunta_usuario = data.get("message", "")
+            
+            # 1. Busca nas FAQs
+            resposta_faq = buscar_resposta_faq(pergunta_usuario)
+            if resposta_faq:
+                return JsonResponse({"response": resposta_faq})
+            
+            # 2. Chama OpenRouter se não encontrar nas FAQs
+            headers = {
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "model": "openai/gpt-3.5-turbo",
+                "messages": [{"role": "user", "content": pergunta_usuario}]
+            }
+            
+            response = requests.post(API_URL, headers=headers, json=data)
+            resposta_ia = response.json().get("choices", [{}])[0].get("message", {}).get("content", "Desculpe, não consegui processar sua pergunta.")
+            
+            return JsonResponse({"response": resposta_ia})
+            
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-    
-    return JsonResponse({"error": "Método não permitido"}, status=405)
+            print(f"Erro no chatbot: {str(e)}")  # Para debug
+            return JsonResponse({"error": "Ocorreu um erro interno"}, status=500)
