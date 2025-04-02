@@ -1,3 +1,44 @@
+### Django ###
+*.sqlite3
+*.pyc
+__pycache__/
+migrations/
+*.pot
+*.py[co]
+
+# Arquivos de ambiente do Django
+.env
+.env/
+.env.local
+.env.*.local
+!.env.example  # Mantém o arquivo exemplo
+
+### Backend ###
+# Cobertura de testes
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+### Frontend ###
+# Dependências
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Cache
+.cache/
+.temp/
+
 # Logs
 logs
 *.log
@@ -7,28 +48,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies
-node_modules
-.pnp
-.pnp.js
-
-# Build
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Sistema
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Environment variables
-/.env
-.env.local
-.env.*.local
+Thumbs.db
