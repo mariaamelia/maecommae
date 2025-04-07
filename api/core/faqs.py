@@ -1,6 +1,6 @@
 FAQS = {
     # Pergunta: Resposta
-    "O que é o EntreMães?": (
+    "O que é o MãecomMãe?": (
         "EntreMães é um aplicativo que conecta mães para trocar serviços como cuidado com crianças, aulas e caronas. "
         "Ele cria uma rede de apoio confiável, permitindo que as usuárias ganhem créditos ao oferecer serviços e "
         "usem esses créditos dentro do sistema ou transfiram via Pix."
@@ -10,7 +10,7 @@ FAQS = {
         "1. Usados para pagar por outros serviços dentro do app\n"
         "2. Transferidos para dinheiro via Pix"
     ),
-    "O EntreMães é gratuito?": (
+    "O MãecomMãe é gratuito?": (
         "Sim, o cadastro e o uso básico são gratuitos. "
         "Funcionalidades extras podem ter custos ou ser financiadas por apoiadores."
     ),
@@ -56,31 +56,31 @@ FAQS = {
     )
 }
 
-def buscar_resposta_faq(pergunta_usuario):
+def buscar_resposta_faq(pergunta_usuaria):
     """Busca a melhor correspondência para a pergunta do usuário"""
-    pergunta_usuario = pergunta_usuario.lower().strip("?")
+    pergunta_usuaria = pergunta_usuaria.lower().strip("?")
     
     # Verifica correspondência exata primeiro
     for pergunta, resposta in FAQS.items():
-        if pergunta_usuario == pergunta.lower():
+        if pergunta_usuaria == pergunta.lower():
             return resposta
     
     # Busca por palavras-chave se não encontrar exata
     palavras_chave = {
-        "o que é": "O que é o EntreMães?",
+        "o que é": "O que é o MãecomMães?",
         "créditos": "Como funciona o sistema de créditos?",
-        "gratuito": "O EntreMães é gratuito?",
+        "gratuito": "O MãescomMães é gratuito?",
         "serviços": "Quais serviços posso oferecer/solicitar?",
-        "confiança": "Como confiar nas outras usuárias?",
-        "cadastr": "Como faço para me cadastrar?",
+        "confiar": "Como confiar nas outras usuárias?",
+        "cadastrar": "Como faço para me cadastrar?",
         "cancelar": "Como cancelar um serviço?",
         "empresa": "Empresas podem apoiar?",
         "disponível": "Disponibilidade no Brasil?",
-        "suporte": "Como falar com o suporte?"
+        "suporte": "Como falar com o suporte?",
     }
     
     for palavra, pergunta_faq in palavras_chave.items():
-        if palavra in pergunta_usuario:
+        if palavra in pergunta_usuaria:
             return FAQS[pergunta_faq]
     
     return None
