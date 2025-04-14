@@ -1,7 +1,7 @@
 FAQS = {
     # Pergunta: Resposta
     "O que é o MãecomMãe?": (
-        "EntreMães é um aplicativo que conecta mães para trocar serviços como cuidado com crianças, aulas e caronas. "
+        "MãecomMãe é um aplicativo que conecta mães para trocar serviços como cuidado com crianças, aulas e caronas. "
         "Ele cria uma rede de apoio confiável, permitindo que as usuárias ganhem créditos ao oferecer serviços e "
         "usem esses créditos dentro do sistema ou transfiram via Pix."
     ),

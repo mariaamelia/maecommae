@@ -5,21 +5,17 @@ from django.contrib import messages
 from django.contrib.auth import logout
 import requests
 import os
-
-
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from core.faqs import buscar_resposta_faq
+from core.faqs import buscar_resposta_faq,FAQS
 from dotenv import load_dotenv
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 load_dotenv()
-
 
 
 @ensure_csrf_cookie
@@ -28,16 +24,15 @@ def csrf_cookie(request):
 
 @csrf_exempt
 def register(request):
-    if request.method == 'POST':
-        # Verifica se a requisição tem um corpo JSON
+    if request.method == 'POST':        
         if request.content_type == 'application/json':
             try:
-                data = json.loads(request.body)  # Converte JSON para dicionário Python
-                form = CustomUserCreationForm(data)  # Passa os dados para o formulário
+                data = json.loads(request.body) 
+                form = CustomUserCreationForm(data)  
             except json.JSONDecodeError:
                 return JsonResponse({"error": "JSON inválido"}, status=400)
         else:
-            form = CustomUserCreationForm(request.POST)  # Se não for JSON, usa POST normal
+            form = CustomUserCreationForm(request.POST)  
         
         if form.is_valid():
             user = form.save()
@@ -46,7 +41,7 @@ def register(request):
         else:
             return JsonResponse({"errors": form.errors}, status=400)
 
-    # Se for uma requisição GET, exibe o formulário normalmente (para quem acessa via navegador)
+    
     form = CustomUserCreationForm()
     return render(request, 'core/register.html', {'form': form})
 
@@ -123,32 +118,45 @@ def user_logout(request):
 
 """Testanto chatbot integrado com IA"""
 
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-
+@ensure_csrf_cookie
+def csrf_cookie(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 def chatbot_page(request):
-     return render(request, "core/chatbot.html")
- 
- # Configuração do chatbot
-API_URL = "https://openrouter.ai/api/v1/chat/completions"  # URL da API gratuita do OpenRouter
-API_KEY = os.getenv("OPENROUTER_API_KEY")  # Pegamos a chave da API nas variáveis de ambiente
- 
+    return render(request, "core/chatbot.html")
+
 @csrf_exempt
 def chatbot(request):
     if request.method == "POST":
         try:
+            
+            print("✅ RECEBENDO REQUISIÇÃO /chatbot/")
+            print("BODY CRU:", request.body)            
+    
             data = json.loads(request.body)
+            print("🧠 JSON DECODIFICADO:", data)            
             user_message = data.get("message", "").strip()
-
-            if not user_message:
-                return JsonResponse({"error": "Mensagem vazia"}, status=400)
-
-            # 🔍 1. Verifica se a pergunta está nas FAQs
+            print("🧪 Enviando à IA:", user_message.encode('utf-8'))           
+            
             resposta_faq = buscar_resposta_faq(user_message)
-            if resposta_faq:
-                return JsonResponse({"response": resposta_faq})
-
-            # 2. Chamada à API se não encontrou na FAQ
+            if resposta_faq:                
+                return JsonResponse({"response": resposta_faq})      
+                        
+            faq_context = "Información sobre el proyecto (FAQs):\n"
+            for pregunta, respuesta in FAQS.items():
+                faq_context += f"- {pregunta}: {respuesta}\n"           
+            
+            system_message = (
+                "Você é um assistente atencioso e prestativo para mães de primeira viagem. "
+                "A continuación, se provee información relevante sobre el proyecto:\n\n"
+                f"{faq_context}\n"
+                "Usa esta información para responder de forma precisa a las preguntas relacionadas al proyecto."
+            )
+            
+            
             response = requests.post(
                 API_URL,
                 headers={
@@ -157,16 +165,31 @@ def chatbot(request):
                 },
                 json={
                     "model": "openai/gpt-3.5-turbo",
-                    "messages": [{"role": "user", "content": user_message}]
+                    "messages": [
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": user_message}
+                    ]
                 }
             )
 
+            
+            if response.status_code != 200:
+                print("⚠️ Erro ao chamar OpenRouter:", response.text)
+                return JsonResponse({"error": "Erro na resposta da IA"}, status=500)
+
             ai_response = response.json()
-            bot_reply = ai_response["choices"][0]["message"]["content"]
+            choices = ai_response.get("choices", [])
+            if not choices or "message" not in choices[0]:
+                print("⚠️ Resposta inesperada:", ai_response)
+                return JsonResponse({"response": "Desculpe, não consegui entender sua pergunta."}, status=200)
+            
+            message_content = choices[0]["message"].get("content", "").strip()
+            return JsonResponse({"response": message_content})
 
-            return JsonResponse({"response": bot_reply})
-
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Erro ao processar JSON da requisição."}, status=400)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            print("❌ Erro no servidor:", str(e))
+            return JsonResponse({"error": "Erro interno no servidor."}, status=500)
 
     return JsonResponse({"error": "Método não permitido"}, status=405)
