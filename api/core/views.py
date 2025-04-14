@@ -5,14 +5,28 @@ from django.contrib import messages
 from django.contrib.auth import logout
 import requests
 import os
+
+
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from core.faqs import buscar_resposta_faq
 from dotenv import load_dotenv
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 load_dotenv()
 
 
+
+@ensure_csrf_cookie
+def csrf_cookie(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
+
+@csrf_exempt
 def register(request):
     if request.method == 'POST':
         # Verifica se a requisição tem um corpo JSON
@@ -63,22 +77,48 @@ def home(request):
     form = CustomUserCreationForm()
     return render(request, 'core/register.html', {'form': form})
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+@csrf_exempt
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')  # Redireciona para a página home após o login
-        else:
-            messages.error(request, 'Usuário ou senha incorretos.')
-    return render(request, 'core/login.html')
+        try:
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                email = data.get('email')
+                password = data.get('password')
 
+                try:
+                    # Busca o usuário pelo e-mail e pega o username
+                    user_obj = User.objects.get(email=email)
+                    username = user_obj.username
+                except User.DoesNotExist:
+                    return JsonResponse({'errors': {'email': 'Usuário não encontrado.'}}, status=401)
+
+                user = authenticate(request, username=username, password=password)
+
+                if user is not None:
+                    login(request, user)
+                    return JsonResponse({'message': 'Login realizado com sucesso!','user': user.username }, status=200)
+                else:
+                    return JsonResponse({'errors': {'password': 'Senha incorreta.'}}, status=401)
+            else:
+                return JsonResponse({'error': 'Requisição deve ser JSON.'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+
+@csrf_exempt
 def user_logout(request):
-    logout(request)
-    return redirect('home')
-
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'message': 'Logout realizado com sucesso!'}, status=200)
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 
 """Testanto chatbot integrado com IA"""
