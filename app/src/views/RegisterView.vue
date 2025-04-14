@@ -456,7 +456,7 @@
       })
       successMessage.value = 'Registro bem-sucedido!'
       errors.value = {}
-      // Exibe o modal de sucesso
+      
       showModal.value = true
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
@@ -470,7 +470,7 @@
   
   // Função para buscar os dados do endereço a partir do CEP (usando a API ViaCEP)
   const fetchCep = async () => {
-    // Remove caracteres não numéricos
+   
     const cepClean = formData.value.cep.replace(/\D/g, '')
     if (cepClean.length === 8) {
       try {
@@ -489,7 +489,7 @@
     }
   }
   
-  // Função para fechar o modal e redirecionar para a home
+  
   const closeModal = () => {
     showModal.value = false
     router.push('/')
@@ -497,6 +497,6 @@
   </script>
   
   <style scoped>
-  /* Você pode personalizar os estilos ou adicionar media queries conforme necessário */
+
   </style>
   

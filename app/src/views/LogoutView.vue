@@ -17,7 +17,7 @@ const performLogout = async () => {
     await axios.post('http://127.0.0.1:8000/logout/', {}, {
       headers: { 'Content-Type': 'application/json' }
     })
-    // Após efetuar o logout, redireciona para a página de login
+   
     router.push('/')
   } catch (error) {
     console.error(error)
@@ -31,5 +31,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Adicione estilos conforme necessário */
 </style>
