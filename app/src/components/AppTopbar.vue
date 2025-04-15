@@ -71,7 +71,7 @@ const items = ref([
           <template v-if="!user">
             <RouterLink to="/login" class="text-[#E67E80] font-medium">Acessar</RouterLink>
             <RouterLink to="/register">
-              <AppButton label="Faça seu cadastro" class="w-[180px] h-[38px] text-sm" />
+              <AppButton label="Faça seu cadastro" class="w-[200px] h-[38px] text-sm" />
             </RouterLink>
           </template>
 
